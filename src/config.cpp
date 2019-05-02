@@ -37,7 +37,7 @@ ConfigFile Config::readConfigFile(std::string file) {
 				#endif
 			}
 		} else {
-			std::cerr << "config::readConfigFile found invalid config line " << line <<"; attempting to ignore it. this might cause problems\n";
+			std::cerr << "config::readConfigFile found invalid config line \"" << line <<"\"; attempting to ignore it. this might cause problems\n";
 		}
 	}
 	return out;

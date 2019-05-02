@@ -6,6 +6,8 @@
 #include <unistd.h>
 
 #define MAX_CRASH_COUNT 5
+#define DEMON_LOCATIONS "/etc/basicinit/demons/"
+#define DEMON_LOCATIONS_EXTENSION ".dm"
 
 enum DemonSettings {
 	DEMONNORMAL = 0,
@@ -16,6 +18,7 @@ enum DemonOperation {
 	DEMONSTART = 0,
 	DEMONSTOP,
 	DEMONRESTART,
+	DEMONRUNNING,
 };
 
 class Demon {
@@ -36,7 +39,9 @@ public:
 	// Arguments for this demon to be started
 	std::vector<std::string> args;
 	// Demons that should be started for this demon
-	std::vector<int> wants_demons;
+	std::vector<std::string> wants_demons;
+	// Demons that are absolutley required for the functioning of this demon
+	std::vector<std::string> requires_demons;
 	// Settings
 	DemonSettings settings;
 	// Stop the Demon
@@ -65,6 +70,9 @@ public:
 	// Demon ID related
 	static std::string getDemonNameByID(int id);
 	static int getDemonIDbyName(std::string name);
+	// Add a demon using a config file
+	static int addDemonByConfig(std::string name);
+	static int addAllDemonsByConfig();
 };
 
 #endif
