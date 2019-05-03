@@ -13,7 +13,7 @@ void forkexecwait(std::string file) {
 	// If child..
   if(pid == 0) {
 	  // Exec
-    std::cout << "none::forkexecwait starting " << file << "\n";
+    DODEBUG(std::cout << "none::forkexecwait calling " << file << "\n";)
     int err = execlp(file.c_str(), file.c_str(), NULL);
     perror("None::forkexec still here after exec");
     exit(0);
@@ -40,9 +40,9 @@ void forkexecwait(std::string file, std::vector<std::string> args) {
 		  }
 		  args_c.push_back(NULL);
 		  // I.. i dont even know. For some reason &args_c.front() is char*const* so it needs to be cast?
-      std::cout << "none::forkexecwait calling " << file << "\n";
+      DODEBUG(std::cout << "none::forkexecwait calling " << file << "\n";)
       int err = execvp(file.c_str(), const_cast<char**>(&args_c.front()));
-      perror("None::forkexec still here after exec");
+      DODEBUG(perror("None::forkexec still here after exec");)
       exit(0);
     } else if(pid < 0) {
 		  // Error
@@ -61,7 +61,7 @@ pid_t forkexec(std::string file) {
     // If child..
     if(pid == 0) {
       // Exec
-      std::cout << "none::forkexec calling " << file << "\n";
+      DODEBUG(std::cout << "none::forkexec calling " << file << "\n";)
       int err = execlp(file.c_str(), file.c_str(), NULL);
       perror("None::forkexec still here after exec");
       exit(0);
@@ -86,7 +86,7 @@ pid_t forkexec(std::string file, std::vector<std::string> args) {
         }
         args_c.push_back(NULL);
         // I.. i dont even know. For some reason &args_c.front() is char*const* so it needs to be cast?
-        std::cout << "none::forkexec calling " << file << "\n";
+        DODEBUG(std::cout << "none::forkexec calling " << file << "\n";)
         int err = execvp(file.c_str(), const_cast<char**>(&args_c.front()));
         perror("None::forkexec still here after exec");
         exit(0);

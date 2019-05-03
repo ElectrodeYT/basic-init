@@ -141,8 +141,8 @@ int Demon::restart() {
 }
 
 int Demon::update() {
-	std::cout << "Demon::update Updating demon " << name;
-	if(running == true) {std::cout << "with (pottentialy former) pid " << pid;};
+	DODEBUG(std::cout << "Demon::update Updating demon " << name;)
+	DODEBUG(if(running == true) {std::cout << "with (pottentialy former) pid " << pid;};)
 	std::cout << "\n";
 	if(running != true) {
 		return 0;
@@ -153,24 +153,24 @@ int Demon::update() {
 }
 int Demon::update(int status) {
 	if(status < 0) {
-		std::cout << "Demon::update waitpid returned " << status << ", stopping demon\n";
+		DODEBUG(std::cout << "Demon::update waitpid returned " << status << ", stopping demon\n";)
 		stop();
 		return status;
 	} else if(status >= 0) {
 		if(settings != DEMONNORESTART) {
 			if(crash_count > MAX_CRASH_COUNT) {
 				//std::cerr << "Demon::update demon " << name << "royally fucked, stopping it!\n";
-				DODEBUG(std::cout << "Demon::update demon " << name << "crashed too many times\n";)
+				DODEBUG(std::cout << "Demon::update demon " << name << " crashed too many times\n";)
 				stop();
 				return 0;
 			}
-			std::cout << "Demon::update demon crashed, restarting " << name << "\n";
+			DODEBUG(std::cout << "Demon::update demon crashed, restarting " << name << "\n";)
 			running = false;
 			int c = crash_count + 1;
 			restart(); // restart zeros crash count, so we have to store it
 			crash_count = c;
 		} else {
-			std::cout << "Demon::update demon " << name << " exited\n";
+			DODEBUG(std::cout << "Demon::update demon " << name << " exited\n";)
 			pid = 0;
 			running = false;
 		}
