@@ -1,5 +1,10 @@
-CPP=g++
-CPPFLAGS=--static -Iinclude -DDEBUG
+# Basic Init Makefile.
+# Change CPPFLAGS to define or undefine DEBUG.
+
+CXX=g++-8
+#CPPFLAGS=--static -Iinclude -DDEBUG -std=c++17
+CPPFLAGS=--static -Iinclude -std=c++17
+LINKERARGS=-lstdc++fs
 SOURCEDIR=src/
 SOURCE:=$(shell find $(SOURCEDIR) -name '*.cpp')
 BINARY:=$(SOURCE:.cpp=.o)
@@ -12,7 +17,10 @@ clean:
 	rm $(BINARY) $(NAME) &> /dev/null; true
 
 linking $(NAME): $(BINARY)
-	$(CPP) $(CPPFLAGS) $(BINARY) -o $@
+	$(CXX) $(CPPFLAGS) $(BINARY) $(LINKERARGS) -o $@
 
 %.d: %.cpp
-	$(CPP) $(CPPFLAGS) -o $@ $<
+	$(CXX) $(CPPFLAGS) -o $@ $<
+
+cloc:
+	cloc src include Makefile

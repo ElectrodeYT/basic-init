@@ -1,7 +1,10 @@
 #include <iostream>
+#include <filesystem>
+#include <algorithm>
+#include <sys/wait.h>
 #include <demons.hpp>
 #include <helper.hpp>
-#include <sys/wait.h>
+#include <config.hpp>
 
 std::vector<Demon> demons;
 
@@ -87,6 +90,8 @@ int DemonManager::operateOnDemon(std::string name, DemonOperation op) {
 				demons[i].restart();
 				std::cout << "DemonManager::operateOnDemon restarted demon " << name << "\n";
 				return 0;
+			} else if(op == DEMONRUNNING) {
+				return demons[i].running;
 			} else {
 				std::cout << "DemonManager::operateOnDemon invalid op\n";
 				return -2;
@@ -136,8 +141,8 @@ int Demon::restart() {
 }
 
 int Demon::update() {
-	std::cout << "Demon::update Updating demon " << name;
-	if(running == true) {std::cout << "with (pottentialy former) pid " << pid;};
+	DODEBUG(std::cout << "Demon::update Updating demon " << name;)
+	DODEBUG(if(running == true) {std::cout << "with (pottentialy former) pid " << pid;};)
 	std::cout << "\n";
 	if(running != true) {
 		return 0;
@@ -145,32 +150,94 @@ int Demon::update() {
 	int status;
 	waitpid(pid, &status, WNOHANG);
 	return update(status);
-
 }
 int Demon::update(int status) {
 	if(status < 0) {
-		std::cout << "Demon::update waitpid returned " << status << ", stopping demon\n";
+		DODEBUG(std::cout << "Demon::update waitpid returned " << status << ", stopping demon\n";)
 		stop();
 		return status;
 	} else if(status >= 0) {
 		if(settings != DEMONNORESTART) {
 			if(crash_count > MAX_CRASH_COUNT) {
-				std::cerr << "Demon::update demon " << name << "royally fucked, stopping it!\n";
+				//std::cerr << "Demon::update demon " << name << "royally fucked, stopping it!\n";
+				DODEBUG(std::cout << "Demon::update demon " << name << " crashed too many times\n";)
 				stop();
 				return 0;
 			}
-			std::cout << "Demon::update demon crashed, restarting " << name << "\n";
+			DODEBUG(std::cout << "Demon::update demon crashed, restarting " << name << "\n";)
 			running = false;
 			int c = crash_count + 1;
 			restart(); // restart zeros crash count, so we have to store it
 			crash_count = c;
 		} else {
-			std::cout << "Demon::update demon " << name << " exited\n";
+			DODEBUG(std::cout << "Demon::update demon " << name << " exited\n";)
 			pid = 0;
 			running = false;
 		}
 		return 0;
 	}
+	return 0;
+}
+
+int DemonManager::addDemonByConfig(std::string dname) {
+	std::string cpath = DEMON_LOCATIONS + dname + DEMON_LOCATIONS_EXTENSION;
+	ConfigFile config = Config::readConfigFile(cpath);
+	std::string name; // Name of the demon to be loaded.
+	std::string path; // Executable path.
+	std::vector<std::string> args; // Arguments.
+	DemonSettings settings; // DemonSettings.
+	std::vector<std::string> wants;
+	std::vector<std::string> requires;
+	for(int i = 0; i < config.config_names.size(); i++) {
+		if(config.config_names[i] == "name") {
+			name = config.config_values[i];
+		}
+		if(config.config_names[i] == "path") {
+			path = config.config_values[i];
+		}
+		if(config.config_names[i] == "arguments") {
+			args = split_string(config.config_values[i], " ");
+		}
+		if(config.config_names[i] == "wants") {
+			wants.push_back(config.config_values[i]);
+		}
+		if(config.config_names[i] == "requires") {
+			wants.push_back(config.config_values[i]);
+		}
+		if(config.config_names[i] == "settings") {
+			if(config.config_values[i] == "normal") {
+				settings = DEMONNORMAL;
+			} else if(config.config_values[i] == "norestart") {
+				settings = DEMONNORESTART;
+			} else {
+				settings = DEMONNORMAL;
+			}
+		}
+	}
+	if(name == "" || path == "") {
+		// Invalid demon
+		return -1;
+	}
+	return DemonManager::addDemon(path, name, args, settings);
+}
+
+int DemonManager::addAllDemonsByConfig() {
+	std::vector<std::string> files;
+	std::filesystem::directory_iterator iter(DEMON_LOCATIONS);
+	std::filesystem::directory_iterator end;
+	while(iter != end) {
+		std::error_code err_code;
+		if(!std::filesystem::is_directory(iter->path())) {
+			if(iter->path().extension() == DEMON_LOCATIONS_EXTENSION) {
+				DemonManager::addDemonByConfig(iter->path().stem());
+			}
+		}
+		iter.increment(err_code);
+		if(err_code) {
+			std::cout << "DemonManager::addAllDemonsByConfig failed to iterate directory with error: " << err_code.message() << "\n";
+		}
+	}
+	return 0;
 }
 
 Demon::Demon() {

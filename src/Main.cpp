@@ -6,6 +6,8 @@
 #include <helper.hpp>
 #include <signals.hpp>
 #include <demons.hpp>
+#include <demongroups.hpp>
+#include <demongrouphandler.hpp>
 #include <unistd.h>
 
 // Number of TTY demons to spawn.
@@ -31,8 +33,11 @@ int main(int argc, char** argv) {
 		} else if(config_main.config_names[i] == "shell") {
 			start_shell = true;
 			shell = config_main.config_values[i];
+		// shell_on_console: launch a shell on /dev/console. most of the time /dev/tty1 is cloned to console so there is no use
+		// on desktop systems.
 		} else if(config_main.config_names[i] == "shell_on_console") {
 			if(config_main.config_values[i] == "yes") { start_shell_on_console = true; } else { start_shell_on_console = false; }
+		// start_shell: manually start gettys
 		} else if(config_main.config_names[i] == "start_shell") {
 			if(config_main.config_values[i] == "yes") { start_shell = true; } else { start_shell = false;}
 		}
@@ -63,5 +68,24 @@ int main(int argc, char** argv) {
 			DemonManager::operateOnDemon("gettyconsole", DEMONSTART);
 		}
 	}
+	DemonManager::addAllDemonsByConfig();
+	DemonGroupManager::getAllDemonGroups();
+	DemonGroupHandler::startRequiredDemons();
+	DemonGroupHandler::startDefaultDemonGroup();
+	DODEBUG(std::cout << "None::main startup finished; printing all demons\n";)
+	DODEBUG(
+		for(int i = 0; i < demons.size(); i++) {
+			std::cout << "None:main " << demons[i].name << "\n";
+		}
+
+	)
+	DODEBUG(std::cout << "None::main printing all demongroups\n";)
+	DODEBUG(
+		for(int i = 0; i < demon_groups.size(); i++) {
+			std::cout << "None:main " << demon_groups[i].name << "\n";
+		}
+
+	)
+
 	while(true) {sleep(1000);}
 }
