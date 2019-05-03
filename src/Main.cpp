@@ -72,5 +72,20 @@ int main(int argc, char** argv) {
 	DemonGroupManager::getAllDemonGroups();
 	DemonGroupHandler::startRequiredDemons();
 	DemonGroupHandler::startDefaultDemonGroup();
+	DODEBUG(std::cout << "None::main startup finished; printing all demons\n";)
+	DODEBUG(
+		for(int i = 0; i < demons.size(); i++) {
+			std::cout << "None:main " << demons[i].name << "\n";
+		}
+
+	)
+	DODEBUG(std::cout << "None::main printing all demongroups\n";)
+	DODEBUG(
+		for(int i = 0; i < demon_groups.size(); i++) {
+			std::cout << "None:main " << demon_groups[i].name << "\n";
+		}
+
+	)
+
 	while(true) {sleep(1000);}
 }

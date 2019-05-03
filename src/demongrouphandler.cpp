@@ -12,11 +12,11 @@ int DemonGroupHandler::startRequiredDemons() {
 }
 
 // Attempts to start the default demon group and its requirements.
-int DemonGroupHandler::startDefaultDemonGroup() {
+int DemonGroupHandler::startDefaultDemonGroup() {/*
   if(DemonGroupManager::executeDemonGroup(DEFAULT_GROUP_1)) {
     return true;
   }
-  if(DemonGroupManager::executeDemonGroup(DEFAULT_GROUP_2)) {
+  */if(DemonGroupManager::executeDemonGroup(DEFAULT_GROUP_2)) {
     return true;
   }
   if(DemonGroupManager::executeDemonGroup(DEFAULT_GROUP_3)) {

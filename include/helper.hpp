@@ -6,8 +6,10 @@
 
 #ifdef DEBUG
 #define DODEBUG(A) A
+#define DONDEBUG(A)
 #else
 #define DODEBUG(A)
+#define DONDEBUG(A) A
 #endif
 
 void forkexecwait(std::string file);

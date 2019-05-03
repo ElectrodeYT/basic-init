@@ -159,7 +159,8 @@ int Demon::update(int status) {
 	} else if(status >= 0) {
 		if(settings != DEMONNORESTART) {
 			if(crash_count > MAX_CRASH_COUNT) {
-				std::cerr << "Demon::update demon " << name << "royally fucked, stopping it!\n";
+				//std::cerr << "Demon::update demon " << name << "royally fucked, stopping it!\n";
+				DODEBUG(std::cout << "Demon::update demon " << name << "crashed too many times\n";)
 				stop();
 				return 0;
 			}
