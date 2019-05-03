@@ -1,5 +1,9 @@
+# Basic Init Makefile.
+# Change CPPFLAGS to define or undefine DEBUG.
+
 CXX=g++-8
-CPPFLAGS=--static -Iinclude -DDEBUG -std=c++17
+#CPPFLAGS=--static -Iinclude -DDEBUG -std=c++17
+CPPFLAGS=--static -Iinclude -std=c++17
 LINKERARGS=-lstdc++fs
 SOURCEDIR=src/
 SOURCE:=$(shell find $(SOURCEDIR) -name '*.cpp')
