@@ -106,5 +106,6 @@ std::vector<std::string> split_string(std::string str, std::string delimiter) {
     ret.push_back(token);
     str.erase(0, pos + delimiter.length());
   }
+  ret.push_back(str); // Add the rest
   return ret;
 }

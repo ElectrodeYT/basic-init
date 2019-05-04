@@ -48,7 +48,7 @@ std::string DemonManager::getDemonNameByID(int id) {
 
 int DemonManager::getDemonIDbyName(std::string name) {
 	if(name == "") { // Probably from getDemonNameByID
-		// TODO: Hanle this
+		// TODO: Handle this
 		return -1;
 	}
 	// Look at every demon and compare the name
@@ -197,6 +197,13 @@ int DemonManager::addDemonByConfig(std::string dname) {
 		}
 		if(config.config_names[i] == "arguments") {
 			args = split_string(config.config_values[i], " ");
+			DODEBUG(std::cout << "DemonManager::addDemonByConfig set args to ";
+				for(int x = 0; x < args.size(); x++) {
+					std::cout << args[x] << " ";
+				}
+				std::cout << "\n";
+				std::cout << "DemonManager::addDemonByConfig line in config file says " << config.config_values[i] << "\n";
+			)
 		}
 		if(config.config_names[i] == "wants") {
 			wants.push_back(config.config_values[i]);
