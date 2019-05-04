@@ -12,9 +12,10 @@
 
 // Number of TTY demons to spawn.
 #define TTY_COUNT 4
+#define BASICINIT_VERSION "0.1"
 
 int main(int argc, char** argv) {
-	std::cout << "BasicInit v0.1\n";
+	std::cout << "BasicInit" << BASICINIT_VERSION << "\n";
 	// Setup signal handlers
 	signal(SIGCHLD, sigchld);
 	ConfigFile config_main = Config::readConfigFile("/etc/basicinit/init.cfg");
@@ -49,7 +50,7 @@ int main(int argc, char** argv) {
 		forkexecwait("mount", args);
 	}
 	if(start_shell == true) {
-		std::cout << "None::main Starting shells\n";
+		DODEBUG(std::cout << "None::main Starting shells\n";)
 		for(int i = 1; i <= TTY_COUNT; i++) {
 			// Start Restart Demons for each TTY until TTY_COUNT
 			std::stringstream ss_name;
@@ -57,12 +58,12 @@ int main(int argc, char** argv) {
 			std::stringstream ss_getty;
 			ss_getty << "tty" << i;
 			std::vector<std::string> args = {"0", ss_getty.str()};
-			std::cout << "None::main Adding Demon with name " << ss_name.str() << " and path of " << "getty" << "\n";
+			DODEBUG(std::cout << "None::main Adding Demon with name " << ss_name.str() << " and path of getty" << "\n";)
 			DemonManager::addDemon("getty", ss_name.str(), args, DEMONNORMAL);
 			DemonManager::operateOnDemon(ss_name.str(), DEMONSTART);
 		}
 		if(start_shell_on_console == true) {
-			std::cout << "None::main Creating Console Shell Demon\n";
+			DODEBUG(std::cout << "None::main Creating Console Shell Demon\n";)
 			std::vector<std::string> args = {"0", "console"};
 			DemonManager::addDemon("getty", "gettyconsole", args, DEMONNORMAL);
 			DemonManager::operateOnDemon("gettyconsole", DEMONSTART);
