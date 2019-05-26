@@ -2,8 +2,7 @@
 A Basic Linux Init.
 The goal is to have enough functionality without any other programs or init scripts to start a full linux system.
 # Current Status
-At the moment the Init is capable of launching gettys on the ttys.
-I am also implementing "DemonGroups", similar to systemd targets but simpler.
+At the moment the Init is capable of launching gettys on the ttys, and so called Demons in Demongroups. Communication between the init and the rest of the system is not implemented.
 
 
 # Demons
