@@ -1,1 +1,7 @@
 language: c++
+deploy:
+  provider: releases
+  file: "init"
+  skip_cleanup: true
+  on:
+    tags: true
