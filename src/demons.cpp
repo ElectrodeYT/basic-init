@@ -24,7 +24,7 @@ int DemonManager::addDemon(std::string path, std::string name, std::vector<std::
                 if(demons[i].name == name) { found = true; break; }
         }
         if(found == true) {
-                std::cerr << "DemonManager::addDemon attempted to add another demon but found demon with same name!\n";
+                ERRORPRINT("attempted to add another demon but found demon with same name!");
                 return -1;
         }
         // Create Demon
@@ -68,7 +68,7 @@ int DemonManager::deleteDemon(std::string name) {
 			return 0;
 		}
 	}
-	std::cerr << "DemonManager::deleteDemon attempted to delete demon that doesnt exist!\n";
+	ERRORPRINT("attempted to delete demon that doesnt exist!");
 	return -1;
 }
 
@@ -77,28 +77,28 @@ int DemonManager::operateOnDemon(std::string name, DemonOperation op) {
 		if(demons[i].name == name) {
 			if(op == DEMONSTART) {
 				if(demons[i].start() < 0) {
-					std::cout << "DemonManager::operateOnDemon failed to start demon " << name << "\n";
+					DEBUGPRINT("failed to start demon " << name);
 					return -1;
 				}
-				std::cout << "DemonManager::operateOnDemon started demon " << name << "\n";
+				DEBUGPRINT("started demon " << name);
 				return 0;
 			} else if(op == DEMONSTOP) {
 				demons[i].stop();
-				std::cout << "DemonManager::operateOnDemon stopped demon " << name << "\n";
+				DEBUGPRINT("stopped demon " << name);
 				return 0;
 			} else if(op == DEMONRESTART) {
 				demons[i].restart();
-				std::cout << "DemonManager::operateOnDemon restarted demon " << name << "\n";
+				DEBUGPRINT("restarted demon " << name);
 				return 0;
 			} else if(op == DEMONRUNNING) {
 				return demons[i].running;
 			} else {
-				std::cout << "DemonManager::operateOnDemon invalid op\n";
+				ERRORPRINT("invalid op!");
 				return -2;
 			}
 		}
 	}
-	std::cout << "DemonManager::operateOnDemon invalid demon\n";
+	ERRORPRINT("invalid demon");
 	return -1;
 }
 
@@ -114,6 +114,9 @@ int Demon::start() {
 	return p;
 }
 
+/// Stop the Demon.
+/// Doneby sending SIGTERM to the demon, waiting 500000 us, and then sending SIGKILL if the pid exists.
+/// SUPER BIG TODO: Another process may take this pid in this time. Fix this.
 int Demon::stop() {
 	if(running == false) {
 		return 0;
@@ -133,6 +136,7 @@ int Demon::stop() {
 	return 0;
 }
 
+/// Restart the demon.
 int Demon::restart() {
 	if(Demon::stop() != 0) {
 		return -1;
@@ -140,9 +144,10 @@ int Demon::restart() {
 	return Demon::start();
 }
 
+/// Update the demon.
 int Demon::update() {
-	DODEBUG(std::cout << "Demon::update Updating demon " << name;)
-	DODEBUG(if(running == true) {std::cout << "with (pottentialy former) pid " << pid;};)
+	DEBUGPRINT("Updating Demon " << name);
+	DODEBUG(if(running == true) {DEBUGPRINT("with (pottentialy former) pid " << pid);};)
 	std::cout << "\n";
 	if(running != true) {
 		return 0;
@@ -151,26 +156,27 @@ int Demon::update() {
 	waitpid(pid, &status, WNOHANG);
 	return update(status);
 }
+
+// Update the demon.
 int Demon::update(int status) {
 	if(status < 0) {
-		DODEBUG(std::cout << "Demon::update waitpid returned " << status << ", stopping demon\n";)
+		DEBUGPRINT("waitpid returned " << status << ", stopping demon");
 		stop();
 		return status;
 	} else if(status >= 0) {
 		if(settings != DEMONNORESTART) {
 			if(crash_count > MAX_CRASH_COUNT) {
-				//std::cerr << "Demon::update demon " << name << "royally fucked, stopping it!\n";
-				DODEBUG(std::cout << "Demon::update demon " << name << " crashed too many times\n";)
+				DEBUGPRINT("demon " << name << " crashed too many times");
 				stop();
 				return 0;
 			}
-			DODEBUG(std::cout << "Demon::update demon crashed, restarting " << name << "\n";)
+			DEBUGPRINT("demon crashed, restarting " << name);
 			running = false;
 			int c = crash_count + 1;
-			restart(); // restart zeros crash count, so we have to store it
+			restart(); // resets zeros crash count, so we have to store it
 			crash_count = c;
 		} else {
-			DODEBUG(std::cout << "Demon::update demon " << name << " exited\n";)
+			DEBUGPRINT("demon " << name << " exited");
 			pid = 0;
 			running = false;
 		}
@@ -197,13 +203,6 @@ int DemonManager::addDemonByConfig(std::string dname) {
 		}
 		if(config.config_names[i] == "arguments") {
 			args = split_string(config.config_values[i], " ");
-			DODEBUG(std::cout << "DemonManager::addDemonByConfig set args to ";
-				for(int x = 0; x < args.size(); x++) {
-					std::cout << args[x] << " ";
-				}
-				std::cout << "\n";
-				std::cout << "DemonManager::addDemonByConfig line in config file says " << config.config_values[i] << "\n";
-			)
 		}
 		if(config.config_names[i] == "wants") {
 			wants.push_back(config.config_values[i]);
@@ -241,7 +240,7 @@ int DemonManager::addAllDemonsByConfig() {
 		}
 		iter.increment(err_code);
 		if(err_code) {
-			std::cout << "DemonManager::addAllDemonsByConfig failed to iterate directory with error: " << err_code.message() << "\n";
+			ERRORPRINT("failed to iterate directory with error: " << err_code.message());
 		}
 	}
 	return 0;

@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+// Define DODEBUG Macros
+
 #ifdef DEBUG
 #define DODEBUG(A) A
 #define DONDEBUG(A)
@@ -11,6 +13,12 @@
 #define DODEBUG(A)
 #define DONDEBUG(A) A
 #endif
+
+// Define DEBUGPRINT Macros
+#define DEBUGPRINT(A) DODEBUG(std::cout << "[" << __PRETTY_FUNCTION__ << "] " << A << "\n");
+#define DEBUGPRINT_NONEWLINE(A) DODEBUG(std::cout << "[" << __PRETTY_FUNCTION__ << "] " << A);
+// Define ERRRORPRINT Macros
+#define ERRORPRINT(A) std::cerr << "[" << __PRETTY_FUNCTION__ << "] " << A << "\n";
 
 void forkexecwait(std::string file);
 void forkexecwait(std::string file, std::vector<std::string> args);

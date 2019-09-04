@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 		forkexecwait("mount", args);
 	}
 	if(start_shell == true) {
-		DODEBUG(std::cout << "None::main Starting shells\n";)
+		DEBUGPRINT("Starting shells");
 		for(int i = 1; i <= TTY_COUNT; i++) {
 			// Start Restart Demons for each TTY until TTY_COUNT
 			std::stringstream ss_name;
@@ -58,12 +58,11 @@ int main(int argc, char** argv) {
 			std::stringstream ss_getty;
 			ss_getty << "tty" << i;
 			std::vector<std::string> args = {"0", ss_getty.str()};
-			DODEBUG(std::cout << "None::main Adding Demon with name " << ss_name.str() << " and path of getty" << "\n";)
 			DemonManager::addDemon("getty", ss_name.str(), args, DEMONNORMAL);
 			DemonManager::operateOnDemon(ss_name.str(), DEMONSTART);
 		}
 		if(start_shell_on_console == true) {
-			DODEBUG(std::cout << "None::main Creating Console Shell Demon\n";)
+			DEBUGPRINT("Creating Console Shell");
 			std::vector<std::string> args = {"0", "console"};
 			DemonManager::addDemon("getty", "gettyconsole", args, DEMONNORMAL);
 			DemonManager::operateOnDemon("gettyconsole", DEMONSTART);
@@ -73,17 +72,17 @@ int main(int argc, char** argv) {
 	DemonGroupManager::getAllDemonGroups();
 	DemonGroupHandler::startRequiredDemons();
 	DemonGroupHandler::startDefaultDemonGroup();
-	DODEBUG(std::cout << "None::main startup finished; printing all demons\n";)
+	DEBUGPRINT("Startup complete, printing all demons")
 	DODEBUG(
 		for(int i = 0; i < demons.size(); i++) {
-			std::cout << "None:main " << demons[i].name << "\n";
+			DEBUGPRINT(demons[i].name);
 		}
 
 	)
 	DODEBUG(std::cout << "None::main printing all demongroups\n";)
 	DODEBUG(
 		for(int i = 0; i < demon_groups.size(); i++) {
-			std::cout << "None:main " << demon_groups[i].name << "\n";
+			DEBUGPRINT(demons[i].name);
 		}
 
 	)
